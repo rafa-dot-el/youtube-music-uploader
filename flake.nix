@@ -19,7 +19,7 @@
         packages = {
           myapp = mkPoetryApplication {
             projectDir = self;
-            python = python;
+            inherit python;
             nativeBuildInputs = with pkgs; [ pkg-config ];
             overrides = pkgs.poetry2nix.overrides.withDefaults (self: super:
               let
