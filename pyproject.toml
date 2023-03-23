@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "ytm-uploader"
+version = "0.1.0"
+description = "Youtube Music Uploader"
+authors = ["Rafael"]
+license = "GPL3"
+readme = "README.org"
+packages = [{include = "ytm_uploader"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ytmusicapi = "^0.25.0"
+click = "^8.1.3"
+loguru = "^0.6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+ytm-login = "ytm_uploader.cli:login"
+ytm-upload = "ytm_uploader.cli:upload"

@@ -1,0 +1,66 @@
+#+title: Youtube Music Uploader
+
+Upload your music to Youtube Music and listen to it without paying.
+
+[[./screenshot.png]]
+
+* Install
+* Login
+On Firefox, navigate to [[Music][music.google.com]], after your login, open the developer
+tools, and refresh the page. Filter for =POST= requests to Youtube Music domain,
+click with the right mouse button and =Copy Value > Copy Request Headers=.
+
+Then run
+
+#+begin_src bash
+ytm-login
+#+end_src
+
+And paste the headers. If you prefer to create the configuration file by hand.
+Follow the format below:
+
+#+begin_src json
+{
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0",
+    "Accept": "*/*",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Content-Type": "application/json",
+    "X-Goog-AuthUser": "0",
+    "x-origin": "https://music.youtube.com",
+    "Cookie" : "PASTE_COOKIE"
+}
+#+end_src
+* Upload
+Just execute
+
+#+begin_src bash
+ytm-upload --file /folder-or-file/
+#+end_src
+
+It will recursively scan all directories and upload all acceptable music files
+to Youtube Music.
+
+ - mp3
+ - m4a
+ - wma
+ - flac
+ - ogg
+
+* Listening
+Using =mopidy= the plugin [[https://github.com/OzymandiasTheGreat/mopidy-ytmusic][mopidy-ytmusic]]
+
+While Youtube Music introduced the limitations on their app to restrict it
+running in background. A better player and alternative is to use [[https://f-droid.org/packages/it.vfsfitvnm.vimusic/][ViMusic]],
+[[https://github.com/z-huang/InnerTune][InnerTune]] or [[https://github.com/KRTirtho/spotube][spotube.]] These players so far don't allow you to log into your
+account and consume your own music.
+* Hacking
+This repository uses =nix= and =direnv= to setup an isolated development environment.
+* Disclaimer
+This or previous program is for Educational purpose ONLY. Do not use it without
+permission. The usual disclaimer applies, especially the fact that me (rafa-dot-el)
+is not liable for any damages caused by direct or indirect use of the
+information or functionality provided by these programs. The author or any
+Internet provider bears NO responsibility for content or misuse of these
+programs or any derivatives thereof. By using these programs you accept the fact
+that any damage (dataloss, system crash, system compromise, etc.) caused by the
+use of these programs is not rafa-dot-el's responsibility.
