@@ -15,23 +15,42 @@ def login():
 
 
 @click.command()
-@click.option("--file", help="File or Folder to upload")
-def upload(file: str):
-    api = YTMusic("headers_auth.json")
+@click.option("--filename", help="File or Folder to upload")
+@click.option(
+    "--auth-file",
+    help="Authentication file (headers_auth.json)",
+    default="headers_auth.json",
+)
+@click.option(
+    "--track-file", help="File to keep track of uploaded files", default="uploaded"
+)
+def upload(filename: str, auth_file: str, track_file: str):
+    api = YTMusic(auth_file)
+    uploaded = read_uploaded(track_file)
     if not api:
         log.error("Authentication problems, check your configuration or run ytm-login")
     else:
-        callback = lambda file: upload_file(api, file)
-        recurse(file, callback)
+        callbacklmb = lambda f: callback(api, f, uploaded, track_file)
+        recurse(filename, callbacklmb)
+        write_uploaded(track_file, uploaded)
 
 
-def upload_file(api: YTMusic, file: str) -> None:
+def callback(api: YTMusic, filename: str, uploaded: set[str], track_file: str):
+    upload_file(api, filename, uploaded)
+    write_uploaded(track_file, uploaded)
+
+
+def upload_file(api: YTMusic, filename: str, uploaded: set[str]) -> None:
     try:
-        log.info("Uploading song {}", file)
-        response = api.upload_song(file)
-        log.info("Upload done {} - {}", file, response)
+        if filename in uploaded:
+            log.info("Skipping file {}, already uploaded", filename)
+        else:
+            log.info("Uploading song {}", filename)
+            response = api.upload_song(filename)
+            log.info("Upload done {} - {}", filename, response)
+            uploaded.add(filename)
     except Exception as e:
-        log.error("Error uploading file {} - {}", file, e)
+        log.error("Error uploading file {} - {}", filename, e)
 
 
 def recurse(
@@ -48,6 +67,27 @@ def recurse(
         for filename in os.listdir(root):
             file = os.path.join(root, filename)
             recurse(file, callback)
+
+
+def write_uploaded(filename: str, content: set[str]) -> None:
+    try:
+        with open(filename, "w") as file:
+            file.writelines("\n".join(content))
+    except Exception as e:
+        log.error("Error writing uploaded file list {}: {}", filename, e)
+
+
+def read_uploaded(filename: str) -> set[str]:
+    result = set()
+    try:
+        with open(filename, "r") as file:
+            file_contents = file.read()
+            lines = file_contents.splitlines()
+            for line in lines:
+                result.add(line)
+    except Exception as e:
+        log.error("Error opening state file {}: {}", filename, e)
+    return result
 
 
 if __name__ == "__main__":
